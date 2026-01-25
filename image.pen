@@ -1,0 +1,94 @@
+{
+  "version": "2.6",
+  "children": [
+    {
+      "type": "text",
+      "id": "7o3qa",
+      "x": -658,
+      "y": -491,
+      "fill": "#ffffff",
+      "textGrowth": "fixed-width-height",
+      "width": 738,
+      "height": 80,
+      "content": "HAGAKURE PROGRAMMING塾\nScroll　ブログカウンター ",
+      "fontFamily": "Inter",
+      "fontSize": 48,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "rectangle",
+      "id": "JZmRI",
+      "x": -683,
+      "y": 45,
+      "fill": "#CCCCCC",
+      "width": 1105,
+      "height": 339
+    },
+    {
+      "type": "ellipse",
+      "id": "BdOky",
+      "x": -50,
+      "y": -339,
+      "fill": "#CCCCCC",
+      "width": 218,
+      "height": 221
+    },
+    {
+      "type": "text",
+      "id": "Sieta",
+      "x": -653,
+      "y": -288,
+      "fill": "#ffffff",
+      "content": "ブログ数",
+      "fontFamily": "Inter",
+      "fontSize": 32,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "text",
+      "id": "1f4pN",
+      "x": -653,
+      "y": -207,
+      "fill": "#ffffff",
+      "content": "ライター数",
+      "fontFamily": "Inter",
+      "fontSize": 32,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "text",
+      "id": "03Mvc",
+      "x": -433,
+      "y": -288,
+      "fill": "#ffffff",
+      "textGrowth": "fixed-width",
+      "width": 314,
+      "content": "〇〇件　/目標８０件",
+      "fontFamily": "Inter",
+      "fontSize": 32,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "text",
+      "id": "uqc4B",
+      "x": -433,
+      "y": -207,
+      "fill": "#ffffff",
+      "content": "〇〇人　/目標２０人",
+      "fontFamily": "Inter",
+      "fontSize": 32,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "text",
+      "id": "sg0bJ",
+      "x": -683,
+      "y": -84,
+      "fill": "#ffffff",
+      "content": "目標に近ずくにつれ、拙者の装備が充実するでござる\n皆でブログを書いて、拙者を立派な侍にするでござる！",
+      "fontFamily": "Inter",
+      "fontSize": 32,
+      "fontWeight": "normal"
+    }
+  ]
+}

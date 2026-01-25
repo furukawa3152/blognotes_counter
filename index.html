@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAGAKURE PROGRAMMING塾 - Scroll ブログカウンター</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'zen Maru Gothic', 'Yu Gothic', 'Hiragino Kaku Gothic', 'Meiryo', sans-serif;
+            background: #FEFBF6;
+            color: #625651;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            min-height: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .title {
+            font-size: 56px;
+            font-weight: 700;
+            color: #625651;
+            text-align: center;
+            margin: 0;
+            white-space: pre-line;
+            font-family: 'zen Maru Gothic', 'Yu Gothic', 'Hiragino Kaku Gothic', 'Meiryo', sans-serif;
+            text-shadow: 0 2px 4px rgba(98, 86, 81, 0.1);
+            letter-spacing: 2px;
+            line-height: 1.4;
+        }
+
+        .title-subtitle {
+            font-size: 32px;
+            font-weight: 600;
+            color: #8B7355;
+            text-align: center;
+            margin-top: 10px;
+            font-family: 'zen Maru Gothic', 'Yu Gothic', 'Hiragino Kaku Gothic', 'Meiryo', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .content-area {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .level-image-container {
+            position: relative;
+            width: 100%;
+            max-width: 1105px;
+            height: 339px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            margin-top: 0;
+            overflow: visible;
+            flex-shrink: 0;
+        }
+
+        .level-image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .level-image-container .loading {
+            font-size: 24px;
+            color: #625651;
+            text-align: center;
+            position: absolute;
+        }
+
+        .stats-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid rgba(98, 86, 81, 0.2);
+            border-radius: 12px;
+            padding: 25px 30px;
+            box-shadow: 0 2px 8px rgba(98, 86, 81, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(98, 86, 81, 0.05), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 16px rgba(98, 86, 81, 0.15);
+            border-color: rgba(98, 86, 81, 0.3);
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            font-size: 28px;
+            color: #625651;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            opacity: 0.8;
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-value-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #625651;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .stat-unit {
+            font-size: 24px;
+            color: #625651;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .stat-goal {
+            font-size: 20px;
+            color: #625651;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        .stat-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(98, 86, 81, 0.1);
+            border-radius: 10px;
+            overflow: visible;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .stat-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #8B7355 0%, #A68B5B 50%, #C4A574 100%);
+            border-radius: 10px;
+            transition: width 1s ease-out;
+            box-shadow: 0 2px 4px rgba(139, 115, 85, 0.3);
+            position: relative;
+            overflow: visible;
+        }
+
+        .stat-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+            border-radius: 10px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .stat-percentage {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            font-weight: 600;
+            color: #625651;
+            white-space: nowrap;
+            padding-left: 8px;
+            background: rgba(254, 251, 246, 0.95);
+            z-index: 10;
+            line-height: 1;
+        }
+
+        .description {
+            font-size: 32px;
+            color: #625651;
+            text-align: center;
+            white-space: pre-line;
+            margin-bottom: 15px;
+            margin-top: 0;
+            width: 100%;
+            max-width: 1105px;
+            padding: 0 20px;
+        }
+
+        .loading {
+            font-size: 24px;
+            color: #625651;
+            text-align: center;
+        }
+
+        .blog-write-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 40px;
+            padding: 30px 60px;
+            background: #ffffff;
+            border: 4px solid rgba(98, 86, 81, 0.3);
+            border-radius: 24px;
+            text-decoration: none;
+            color: #625651;
+            font-size: 40px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(98, 86, 81, 0.1);
+        }
+
+        .blog-write-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(98, 86, 81, 0.15);
+            border-color: rgba(98, 86, 81, 0.5);
+        }
+
+        .blog-write-button img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* レスポンシブデザイン */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 95%;
+                padding: 0 20px;
+            }
+
+            .level-image-container {
+                max-width: 100%;
+            }
+
+            .stats-section {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .title {
+                font-size: 48px;
+            }
+
+            .title-subtitle {
+                font-size: 28px;
+            }
+
+
+            .stat-label {
+                font-size: 26px;
+            }
+
+            .stat-number {
+                font-size: 42px;
+            }
+
+            .stat-unit {
+                font-size: 22px;
+            }
+
+            .description {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                max-width: 100%;
+                min-height: auto;
+                padding: 20px 0;
+            }
+
+            .title-section {
+                margin-bottom: 30px;
+            }
+
+            .title {
+                font-size: 36px;
+                padding: 0 15px;
+                letter-spacing: 1px;
+            }
+
+            .title-subtitle {
+                font-size: 24px;
+                margin-top: 8px;
+            }
+
+            .level-image-container {
+                height: auto;
+                min-height: 200px;
+                margin-bottom: 30px;
+                margin-left: 15px;
+                margin-right: 15px;
+            }
+
+            .stat-label {
+                font-size: 22px;
+            }
+
+            .stat-number {
+                font-size: 36px;
+            }
+
+            .stat-unit {
+                font-size: 20px;
+            }
+
+            .stat-goal {
+                font-size: 18px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .description {
+                font-size: 24px;
+                margin-bottom: 20px;
+                padding: 0 15px;
+            }
+
+            .stats-section {
+                gap: 15px;
+                margin-bottom: 20px;
+                padding: 0 15px;
+            }
+
+            .stat-header {
+                flex-wrap: wrap;
+            }
+
+            .stat-icon {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px 0;
+            }
+
+            .title-section {
+                margin-bottom: 20px;
+            }
+
+            .title {
+                font-size: 28px;
+                padding: 0 10px;
+                letter-spacing: 0.5px;
+            }
+
+            .title-subtitle {
+                font-size: 20px;
+                margin-top: 6px;
+            }
+
+            .level-image-container {
+                min-height: 150px;
+                margin-bottom: 20px;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .stat-label {
+                font-size: 18px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .stat-unit {
+                font-size: 16px;
+            }
+
+            .stat-goal {
+                font-size: 14px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-icon {
+                font-size: 24px;
+            }
+
+            .description {
+                font-size: 18px;
+                margin-bottom: 15px;
+                padding: 0 10px;
+                line-height: 1.5;
+            }
+
+            .stats-section {
+                gap: 12px;
+                margin-bottom: 15px;
+                padding: 0 10px;
+            }
+
+            .blog-write-button {
+                margin-top: 30px;
+                padding: 24px 48px;
+                font-size: 36px;
+                gap: 20px;
+            }
+
+            .blog-write-button img {
+                height: 56px;
+            }
+
+            .stat-content {
+                gap: 10px;
+            }
+
+            .stat-progress {
+                height: 6px;
+            }
+
+            .stat-percentage {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .title-section {
+                margin-bottom: 15px;
+            }
+
+            .title {
+                font-size: 24px;
+                padding: 0 10px;
+                letter-spacing: 0.5px;
+            }
+
+            .title-subtitle {
+                font-size: 18px;
+                margin-top: 5px;
+            }
+
+            .stat-label {
+                font-size: 16px;
+            }
+
+            .stat-number {
+                font-size: 24px;
+            }
+
+            .stat-unit {
+                font-size: 14px;
+            }
+
+            .stat-goal {
+                font-size: 12px;
+            }
+
+            .description {
+                font-size: 16px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .blog-write-button {
+                margin-top: 20px;
+                padding: 20px 40px;
+                font-size: 32px;
+                gap: 16px;
+            }
+
+            .blog-write-button img {
+                height: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-section">
+            <h1 class="title">HAGAKURE PROGRAMMING塾
+Scroll　ブログカウンター</h1>
+        </div>
+        
+        <div class="content-area">
+            <div class="level-image-container">
+                <img src="" alt="レベル" id="level-image" style="display: none;">
+                <div class="loading" id="level-loading">読み込み中...</div>
+            </div>
+
+            <div class="description">
+                目標に近ずくにつれ、拙者の装備が充実するでござる
+皆でブログを書いて、拙者を立派な侍にするでござる！
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-card" id="blog-card">
+                    <div class="stat-header">
+                        <div class="stat-label">📝 2026年ブログ数</div>
+                        <div class="stat-icon">📊</div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value-wrapper">
+                            <span class="stat-number" id="blog-number">0</span>
+                            <span class="stat-unit">件</span>
+                        </div>
+                        <div class="stat-goal">目標: <span id="blog-goal">80</span>件</div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-bar" id="blog-progress" style="width: 0%"></div>
+                            <span class="stat-percentage" id="blog-percentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card" id="writer-card">
+                    <div class="stat-header">
+                        <div class="stat-label">✍️ 2026年ライター数</div>
+                        <div class="stat-icon">👥</div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value-wrapper">
+                            <span class="stat-number" id="writer-number">0</span>
+                            <span class="stat-unit">人</span>
+                        </div>
+                        <div class="stat-goal">目標: <span id="writer-goal">20</span>人</div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-bar" id="writer-progress" style="width: 0%"></div>
+                            <span class="stat-percentage" id="writer-percentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="https://hagakurepgm.net/blog/" class="blog-write-button" target="_blank" rel="noopener noreferrer">
+                <img src="images/scroll_logo.png" alt="Scroll">
+                <span>ブログを書く</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Googleスプレッドシートの設定
+        const SPREADSHEET_ID = '1YXsSUy3moQ_HwfGIYm0Tf_pG-IZEf3htmd5WSiIcteU';
+        const SHEET_NAME = 'counter';
+        const API_KEY = ''; // Google Sheets APIキーが必要な場合は設定
+
+        // レベル画像のマッピング（ブログ数に応じて）
+        const levelImages = {
+            0: 'images/LEVEL1.png',
+            10: 'images/LEVEL10.png',
+            20: 'images/LEVEL20.png',
+            30: 'images/LEVEL30.png',
+            40: 'images/LEVEL40.png',
+            50: 'images/LEVEL50.png',
+            60: 'images/LEVEL60.png',
+            70: 'images/LEVEL70.png'
+        };
+
+        // レベル画像を取得する関数
+        function getLevelImage(blogCount) {
+            const levels = Object.keys(levelImages).map(Number).sort((a, b) => b - a);
+            for (const level of levels) {
+                // レベル70の画像は80件（目標値）に到達しないと表示しない
+                if (level === 70) {
+                    if (blogCount >= 80) {
+                        return levelImages[level];
+                    }
+                    continue; // 80件未満の場合は次のレベルをチェック
+                }
+                if (blogCount >= level) {
+                    return levelImages[level];
+                }
+            }
+            return levelImages[0]; // デフォルト
+        }
+
+        // CSV行をパースする関数（引用符や改行に対応）
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        // エスケープされた引用符
+                        current += '"';
+                        i++;
+                    } else {
+                        // 引用符の開始/終了
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    // フィールドの区切り
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            // 最後のフィールドを追加
+            result.push(current.trim());
+            return result;
+        }
+
+        // Googleスプレッドシートからデータを取得
+        async function fetchDataFromSheet() {
+            try {
+                // CSVエクスポートURLを使用（公開されている場合）
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
+                
+                const response = await fetch(csvUrl);
+                if (!response.ok) {
+                    throw new Error(`データの取得に失敗しました: ${response.status}`);
+                }
+
+                const csvText = await response.text();
+                console.log('取得したCSV:', csvText);
+                
+                const lines = csvText.split('\n').filter(line => line.trim() !== '');
+                console.log('パースした行数:', lines.length);
+                
+                // ヘッダー行をスキップして、A2, B2の値を取得
+                if (lines.length >= 2) {
+                    const dataLine = parseCSVLine(lines[1]);
+                    console.log('パースしたデータ:', dataLine);
+                    
+                    // 数値に変換（空文字やNaNの場合は0）
+                    let blogCount = parseFloat(dataLine[0]?.replace(/[^\d.]/g, '') || '0');
+                    let writerCount = parseFloat(dataLine[1]?.replace(/[^\d.]/g, '') || '0');
+                    
+                    // NaNチェック
+                    if (isNaN(blogCount)) {
+                        console.warn('ブログ数がNaNです。値:', dataLine[0]);
+                        blogCount = 0;
+                    }
+                    if (isNaN(writerCount)) {
+                        console.warn('ライター数がNaNです。値:', dataLine[1]);
+                        writerCount = 0;
+                    }
+                    
+                    // 整数に変換
+                    blogCount = Math.floor(blogCount);
+                    writerCount = Math.floor(writerCount);
+                    
+                    console.log('最終的な値 - ブログ数:', blogCount, 'ライター数:', writerCount);
+
+                    // UIを更新
+                    updateUI(blogCount, writerCount);
+                } else {
+                    throw new Error('データが見つかりません');
+                }
+            } catch (error) {
+                console.error('エラー:', error);
+                // エラー時はデフォルト値を表示
+                updateUI(0, 0);
+                document.getElementById('blog-number').textContent = 'エラー';
+                document.getElementById('writer-number').textContent = 'エラー';
+            }
+        }
+
+        // 数字をカウントアップアニメーションで表示
+        function animateNumber(element, targetValue, duration = 1000) {
+            const startValue = parseInt(element.textContent) || 0;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // イージング関数（ease-out）
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOut);
+                
+                element.textContent = currentValue;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = targetValue;
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        // UIを更新する関数
+        function updateUI(blogCount, writerCount) {
+            const blogGoal = 80;
+            const writerGoal = 20;
+
+            // ブログ数の更新
+            const blogNumberElement = document.getElementById('blog-number');
+            animateNumber(blogNumberElement, blogCount);
+            
+            const blogProgress = document.getElementById('blog-progress');
+            const blogPercentage = document.getElementById('blog-percentage');
+            const blogPercent = Math.min((blogCount / blogGoal) * 100, 100);
+            blogProgress.style.width = blogPercent + '%';
+            blogPercentage.textContent = Math.round(blogPercent) + '%';
+
+            // ライター数の更新
+            const writerNumberElement = document.getElementById('writer-number');
+            animateNumber(writerNumberElement, writerCount);
+            
+            const writerProgress = document.getElementById('writer-progress');
+            const writerPercentage = document.getElementById('writer-percentage');
+            const writerPercent = Math.min((writerCount / writerGoal) * 100, 100);
+            writerProgress.style.width = writerPercent + '%';
+            writerPercentage.textContent = Math.round(writerPercent) + '%';
+
+            // レベル画像を更新（上部の円に表示）
+            const levelImage = document.getElementById('level-image');
+            const levelLoading = document.getElementById('level-loading');
+            const levelImagePath = getLevelImage(blogCount);
+            
+            levelImage.src = levelImagePath;
+            levelImage.onload = () => {
+                levelImage.style.display = 'block';
+                if (levelLoading) {
+                    levelLoading.style.display = 'none';
+                }
+            };
+            levelImage.onerror = () => {
+                if (levelLoading) {
+                    levelLoading.textContent = '画像の読み込みに失敗しました';
+                    levelLoading.style.display = 'block';
+                }
+            };
+        }
+
+        // ページ読み込み時にデータを取得
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchDataFromSheet();
+            
+            // 30秒ごとにデータを更新
+            setInterval(fetchDataFromSheet, 30000);
+        });
+    </script>
+</body>
+</html>
